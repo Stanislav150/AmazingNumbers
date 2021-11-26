@@ -1,14 +1,13 @@
 package numbers;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class Main {
     final static Scanner scanner = new Scanner(System.in);
     private static long numOne;
     private static long numTwo;
 
-    private enum Properties {buzz, duck, palindromic, gapful, spy, even, odd, square, sunny}
+    private enum Properties {EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY}
 
     private static Properties propertyNumsOne;
     private static Properties propertyNumsTwo;
@@ -24,7 +23,7 @@ public class Main {
             String[] inputArray = input.split(" ");
             //If a user enters an empty request, print the instructions
             if (input.isEmpty()) printInstructions();
-            //If one number is entered, calculate and print the properties of this number
+                //If one number is entered, calculate and print the properties of this number
             else if (inputArray.length == 1) {
                 int result = CheckingNumbers(input);
                 if (result == 0) repeat = false;
@@ -50,17 +49,16 @@ public class Main {
      * Display the instructions
      */
     public static void printInstructions() {
-        System.out.println("Supported requests: ");
-        System.out.println("- enter a natural number to know its properties;");
-        System.out.println("- enter two natural numbers to obtain the properties of the list:");
-        System.out.println("    * the first parameter represents a starting number;");
-        System.out.println("    * the second parameters show how many consecutive numbers are to be processed;");
-        System.out.println("- two natural numbers and a property to search for;");
-        System.out.println("- two natural numbers and two  properties to search for;");
-        System.out.println("- separate the parameters with one space;");
-        System.out.println("- enter 0 to exit.");
-        System.out.println();
-        System.out.print("Enter a request: ");
+        System.out.println("Supported requests: "
+                + "- enter a natural number to know its properties;" + "\n"
+                + "- enter two natural numbers to obtain the properties of the list:" + "\n"
+                + "\t" + "* the first parameter represents a starting number;" + "\n"
+                + "\t" + "* the second parameters show how many consecutive numbers are to be processed;" + "\n"
+                + "- two natural numbers and a property to search for;" + "\n"
+                + "- two natural numbers and two  properties to search for;" + "\n"
+                +  "- separate the parameters with one space;" + "\n"
+                + "- enter 0 to exit." + "\n\n"
+                + "Enter a request: ");
     }
 
     /**
@@ -103,7 +101,7 @@ public class Main {
             }
         }
         if (nums.length == 3) {
-            String property = nums[2].toLowerCase(Locale.ROOT);
+            String property = nums[2].toUpperCase(Locale.ROOT);
             try {
                 propertyNumsOne = Properties.valueOf(property);
             } catch (IllegalArgumentException | NullPointerException exception) {
@@ -119,14 +117,14 @@ public class Main {
         BitSet bs = new BitSet(8);
         if (nums.length == 4) {
 
-            String propertyOne = nums[2].toLowerCase(Locale.ROOT);
+            String propertyOne = nums[2].toUpperCase(Locale.ROOT);
             try {
                 propertyNumsOne = Properties.valueOf(propertyOne);
             } catch (IllegalArgumentException | NullPointerException exception) {
                 bs.set(0);
             }
 
-            String propertyTwo = nums[3].toLowerCase(Locale.ROOT);
+            String propertyTwo = nums[3].toUpperCase(Locale.ROOT);
             try {
                 propertyNumsTwo = Properties.valueOf(propertyTwo);
             } catch (IllegalArgumentException | NullPointerException exception) {
@@ -161,22 +159,22 @@ public class Main {
             }
         }
         // Incompatible pairs Even and Odd, Duck and Spy, Sunny and Square
-        if (((propertyNumsOne == Properties.even ) && (propertyNumsTwo == Properties.odd)) ||
-            ((propertyNumsOne == Properties.odd ) && (propertyNumsTwo == Properties.even))) {
+        if (((propertyNumsOne == Properties.EVEN) && (propertyNumsTwo == Properties.ODD)) ||
+                ((propertyNumsOne == Properties.ODD) && (propertyNumsTwo == Properties.EVEN))) {
             System.out.println("The request contains mutually exclusive properties: [ODD, EVEN]");
             System.out.println("There are no numbers with these properties.");
             System.out.println();
             System.out.print("Enter a request: ");
             return -1;
-        } else if (((propertyNumsOne == Properties.duck) && (propertyNumsTwo == Properties.spy)) ||
-                  ((propertyNumsOne == Properties.spy) && (propertyNumsTwo == Properties.duck))) {
+        } else if (((propertyNumsOne == Properties.DUCK) && (propertyNumsTwo == Properties.SPY)) ||
+                ((propertyNumsOne == Properties.SPY) && (propertyNumsTwo == Properties.DUCK))) {
             System.out.println("The request contains mutually exclusive properties: [DUCK, SPY]");
             System.out.println("There are no numbers with these properties.");
             System.out.println();
             System.out.print("Enter a request: ");
             return -1;
-        } else if (((propertyNumsOne == Properties.sunny) && (propertyNumsTwo == Properties.square)) ||
-                  ((propertyNumsOne == Properties.square) && (propertyNumsTwo == Properties.sunny))) {
+        } else if (((propertyNumsOne == Properties.SUNNY) && (propertyNumsTwo == Properties.SQUARE)) ||
+                ((propertyNumsOne == Properties.SQUARE) && (propertyNumsTwo == Properties.SUNNY))) {
             System.out.println("The request contains mutually exclusive properties: [SUNNY, SQUARE]");
             System.out.println("There are no numbers with these properties.");
             System.out.println();
@@ -193,17 +191,17 @@ public class Main {
      * Defining and print the properties of a single number
      */
     public static void propertiesSingleNumber() {
-        System.out.println("Properties of " + numOne);
-        System.out.println(checkEvenOdd(numOne) ? "        even: true" : "        even: false");
-        System.out.println(checkEvenOdd(numOne) ? "         odd: false" : "         odd: true");
-        System.out.println(checkBuzz(numOne) ? "        buzz: true" : "        buzz: false");
-        System.out.println(checkDuck(numOne) ? "        duck: true" : "        duck: false");
-        System.out.println(checkPalindrome(numOne) ? " palindromic: true" : " palindromic: false");
-        System.out.println(checkGapful(numOne) ? "      gapful: true" : "      gapful: false");
-        System.out.println(checkSpy(numOne) ? "       spy: true" : "       spy: false");
-        System.out.println(checkSquare(numOne) ? "    square: true" : "     square: false");
-        System.out.println(checkSunny(numOne) ? "     sunny: true" : "      sunny: false");
-        System.out.print("Enter a request: ");
+        System.out.println("Properties of " + numOne + "\n"
+                + (checkEvenOdd(numOne) ? "        even: true" : "        even: false" + "\n"
+                + (checkEvenOdd(numOne) ? "         odd: false" : "         odd: true") + "\n"
+                + (checkBuzz(numOne) ? "        buzz: true" : "        buzz: false") + "\n"
+                + (checkDuck(numOne) ? "        duck: true" : "        duck: false") + "\n"
+                + (checkPalindrome(numOne) ? " palindromic: true" : " palindromic: false") + "\n"
+                + (checkGapful(numOne) ? "      gapful: true" : "      gapful: false") + "\n"
+                + (checkSpy(numOne) ? "       spy: true" : "       spy: false") + "\n"
+                + (checkSquare(numOne) ? "    square: true" : "     square: false") + "\n"
+                + (checkSunny(numOne) ? "     sunny: true" : "      sunny: false") + "\n"
+                + ("Enter a request: ")));
     }
 
     /**
@@ -239,58 +237,52 @@ public class Main {
     /**
      * Searches for numbers that have a certain property
      *
-     * @param startNum  - starting number of the list
-     * @param repeatNum - number of digits in the list
-     * @param properties  - the specified properties
+     * @param startNum   - starting number of the list
+     * @param repeatNum  - number of digits in the list
+     * @param properties - the specified properties
      */
-    public static void numbersSpecifiedProperty(long startNum, long repeatNum, Properties ... properties) {
+    public static void numbersSpecifiedProperty(long startNum, long repeatNum, Properties... properties) {
         BitSet bitSet = new BitSet(8);
         List<Long> listNums = new ArrayList<>();
-        boolean repeat = true;
         long checknum = startNum;
         while (listNums.size() < repeatNum) {
             for (int i = 0; i < properties.length; i++) {
                 switch (properties[i]) {
-                    case buzz:
+                    case BUZZ:
                         if (checkBuzz(checknum)) bitSet.set(i);
                         break;
-                    case duck:
+                    case DUCK:
                         if (checkDuck(checknum)) bitSet.set(i);
                         break;
-                    case palindromic:
+                    case PALINDROMIC:
                         if (checkPalindrome(checknum)) bitSet.set(i);
                         break;
-                    case gapful:
+                    case GAPFUL:
                         if (checkGapful(checknum)) bitSet.set(i);
                         break;
-                    case spy:
+                    case SPY:
                         if (checkSpy(checknum)) bitSet.set(i);
                         break;
-                    case even:
+                    case EVEN:
                         if (checkEvenOdd(checknum)) bitSet.set(i);
                         break;
-                    case odd:
+                    case ODD:
                         if (!checkEvenOdd(checknum)) bitSet.set(i);
                         break;
-                    case square:
+                    case SQUARE:
                         if (checkSquare(checknum)) bitSet.set(i);
                         break;
-                    case sunny:
+                    case SUNNY:
                         if (checkSunny(checknum)) bitSet.set(i);
                         break;
                     default:
                         System.out.println("I can't process this property");
                 }
-
-
             }
             if (bitSet.cardinality() == properties.length) listNums.add(checknum);
             bitSet.clear();
             checknum += 1;
         }
-
-
-
         for (Long num : listNums) {
             System.out.println(num + " is "
                     + (checkEvenOdd(num) ? "even" : "odd")
@@ -321,6 +313,13 @@ public class Main {
         return num % 2 == 0;
     }
 
+    /**
+     * A number is called a buzz number if it is
+     * divisible by 7 or it ends with 7
+     *
+     * @param num num a natural number entered by the user
+     * @return true if num is the buzz number
+     */
     public static boolean checkBuzz(long num) {
         return (num % 10 == 7) || (num % 7 == 0);
     }
@@ -332,6 +331,14 @@ public class Main {
         return (strNum.equals(sb.toString()));
     }
 
+    /**
+     * Numbers   (positive integers expressed in base ten)
+     * that are (evenly) divisible by the number formed by the first
+     * and last digit are known as gapful numbers.
+     *
+     * @param num a natural number entered by the user
+     * @return true if num is the gupful number
+     */
     public static boolean checkGapful(long num) {
         String strNum = Long.toString(num);
         if (strNum.length() < 3) return false;
@@ -384,6 +391,5 @@ public class Main {
     public static boolean checkSunny(long num) {
         return Math.sqrt(num + 1) % 1 == 0;
     }
-
 }
 

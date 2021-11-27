@@ -7,7 +7,8 @@ public class Main {
     private static long numOne;
     private static long numTwo;
 
-    private enum Properties {EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING}
+    private enum Properties
+    {EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING, HAPPY, SAD}
 
     private static final List<String> listOfPropertys = new ArrayList<>();
 
@@ -51,6 +52,7 @@ public class Main {
                 + "\t" + "* the second parameters shows how many consecutive numbers are to be processed;" + "\n"
                 + "- two natural numbers and a properties to search for;" + "\n"
                 + "- separate the parameters with one space;" + "\n"
+                + "- a property preceded by minus must not be present in numbers;" + "\n"
                 + "- enter 0 to exit." + "\n");
         System.out.print("Enter a request: ");
     }
@@ -82,12 +84,12 @@ public class Main {
             try {
                 numTwo = Long.parseLong(nums[1]);
             } catch (NumberFormatException nfe) {
-                System.out.println("The second parameter should be a natural number or zero.");
+                System.out.println("The second parameter should be a natural number.");
                 System.out.print("Enter a request: ");
                 return -1;
             }
             if (numTwo < 0) {
-                System.out.println("The second parameter should be a natural number or zero.");
+                System.out.println("The second parameter should be a natural number.");
                 System.out.print("Enter a request: ");
                 return -1;
             } else if (numTwo == 0) {
@@ -119,13 +121,14 @@ public class Main {
                 System.out.printf("The property [%s] is wrong.\n", sb.toString().toUpperCase(Locale.ROOT));
             else System.out.printf("The properties [%s] are wrong.\n", sb.toString().toUpperCase(Locale.ROOT));
                 System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, " +
-                        "PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING]");
+                        "PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING, HAPPY, SAD]");
                 System.out.println();
                 System.out.print("Enter a request: ");
                 bs.clear();
                 return -1;
        }
-        // Check properties for compatibility. Incompatible pairs Even and Odd, Duck and Spy, Sunny and Square
+        // Check properties for compatibility. Incompatible pairs Even and Odd, Duck and Spy,
+        // Sunny and Square, Happy and Sad
         for (int i = 0; i < listOfPropertys.size() - 1; i++) {
             for (int j = 1; j < listOfPropertys.size(); j++) {
                 if (((listOfPropertys.get(i).equals(Properties.EVEN.toString()))
@@ -159,6 +162,18 @@ public class Main {
                     listOfPropertys.clear();
                     return -1;
                 }
+                else if (((listOfPropertys.get(i).equals(Properties.HAPPY.toString()))
+                        && (listOfPropertys.get(j).equals(Properties.SAD.toString())))
+                        || ((listOfPropertys.get(i).equals(Properties.SAD.toString()))
+                        && (listOfPropertys.get(j).equals(Properties.HAPPY.toString())))) {
+                    System.out.println("The request contains mutually exclusive properties: [HAPPY, SAD]");
+                    System.out.println("There are no numbers with these properties.");
+                    System.out.println();
+                    System.out.print("Enter a request: ");
+                    listOfPropertys.clear();
+                    return -1;
+                }
+
             }
         }
         return 1;
@@ -179,7 +194,9 @@ public class Main {
                 + (checkSpy(numOne) ? "       spy: true" : "       spy: false") + "\n"
                 + (checkSquare(numOne) ? "    square: true" : "     square: false") + "\n"
                 + (checkSunny(numOne) ? "     sunny: true" : "      sunny: false") + "\n"
-                + (checkJumping(numOne) ? "    jumping: true" : "    jumping: false") + "\n");
+                + (checkJumping(numOne) ? "    jumping: true" : "    jumping: false") + "\n"
+                + (checkHappy(numOne) ? "       happy: true" : "      happy: false") + "\n"
+                + (checkSad(numOne) ? "    sad: true" : "    sad: false") + "\n");
         System.out.print("Enter a request: ");
     }
 
@@ -209,7 +226,10 @@ public class Main {
                     + (checkSpy(num) ? ", spy" : "")
                     + (checkSquare(num) ? ", square" : "")
                     + (checkSunny(num) ? ", sunny" : "")
-                    + (checkJumping(num) ? ",  jumping" : ""));
+                    + (checkJumping(num) ? ",  jumping" : "")
+                    + (checkHappy(num) ? ",  happy" : "")
+                    + (checkSad(num) ? ",  sad" : "")
+            );
         }
         System.out.println();
         System.out.print("Enter a request: ");
@@ -259,6 +279,12 @@ public class Main {
                     case JUMPING:
                         if (checkJumping(checknum)) bitSet.set(i);
                         break;
+                    case HAPPY:
+                        if (checkHappy(checknum)) bitSet.set(i);
+                        break;
+                    case SAD:
+                        if (checkSad(checknum)) bitSet.set(i);
+                        break;
                     default:
                         System.out.println("I can't process this property");
                 }
@@ -278,7 +304,9 @@ public class Main {
                     + (checkSpy(num) ? ", spy" : "")
                     + (checkSquare(num) ? ", square" : "")
                     + (checkSunny(num) ? ", sunny" : "")
-                    + (checkJumping(num) ? ", jumping" : ""));
+                    + (checkJumping(num) ? ", jumping" : "")
+                    + (checkHappy(num) ? ", happy" : "")
+                    + (checkSad(num) ? ", sad" : ""));
         }
         listOfPropertys.clear();
         System.out.println();
@@ -306,7 +334,7 @@ public class Main {
 
     /**
      * A number is called a buzz number if it is
-     * divisible by 7 or it ends with 7
+     * divisible by 7, or it ends with 7
      *
      * @param num num a natural number entered by the user
      * @return true if num is the buzz number
@@ -341,8 +369,8 @@ public class Main {
     }
 
     /**
-     * A number is said to be Spy if the sum of all digits
-     * is equal to the product of all digits.
+     * A number is called a spy number if the sum of all
+     * the digits is equal to the product of the digits.
      *
      * @param num - a natural number entered by the user
      * @return true if num is the spy number
@@ -406,5 +434,33 @@ public class Main {
         }
         return (count == array.length - 1);
     }
+    /**
+     * In number theory, a happy number is a number that reaches
+     * 1 after a sequence during which the number is replaced
+     * by the sum of each digit squares.
+     *
+     * @param num a natural number entered by the user
+     * @return true if the num is the happy number
+     */
+    public static boolean checkHappy(long num) {
+        while (true) {
+            String str = Long.toString(num);
+            long[] array = new long[str.length()];
+            for (int i = str.length() - 1; i >= 0; i--) {
+                array[i] = (int) (num % 10);
+                num /= 10;
+            }
+            long sumSquares = 0;
+            for (long l: array) {
+                sumSquares += Math.pow(l, 2);
+            }
+            if (sumSquares == 1) return true;
+            else if (sumSquares == 4) return false;
+            else num = sumSquares;
+        }
+    }
+    public static boolean checkSad(long num) {
+        return !checkHappy(num);
+   }
 }
 

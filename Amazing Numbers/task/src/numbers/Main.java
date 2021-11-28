@@ -6,11 +6,14 @@ public class Main {
     final static Scanner scanner = new Scanner(System.in);
     private static long numOne;
     private static long numTwo;
-
-    private enum Properties
-    {EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING, HAPPY, SAD}
-
+    private static boolean negativeProperty = false;
+    private static String incorrectPairs = "";
     private static final List<String> listOfPropertys = new ArrayList<>();
+
+    enum Properties {
+        EVEN, ODD, BUZZ, DUCK, PALINDROMIC, GAPFUL, SPY,
+        SQUARE, SUNNY, JUMPING, HAPPY, SAD
+    }
 
     public static void main(String[] args) {
         System.out.println("Welcome to Amazing Numbers!");
@@ -23,7 +26,7 @@ public class Main {
             String[] inputArray = input.split(" ");
             //If a user enters an empty request, print the instructions
             if (input.isEmpty()) printInstructions();
-            //If one number is entered, calculate and print the properties of this number
+                //If one number is entered, calculate and print the properties of this number
             else if (inputArray.length == 1) {
                 int result = CheckingNumbers(input);
                 if (result == 0) repeat = false;
@@ -97,87 +100,82 @@ public class Main {
             }
         }
         //Check the correctness of entering the properties of numbers
-        BitSet bs = new BitSet(16);
+        BitSet bitSet = new BitSet(16);
         if (nums.length > 2) {
             for (int i = 2; i < nums.length; i++) {
-                String property = nums[i].toUpperCase(Locale.ROOT);
+                StringBuilder property = new StringBuilder();
+                property.append(nums[i].toUpperCase(Locale.ROOT));
+                if (property.charAt(0) == '-') {
+                    negativeProperty = true;
+                    property.delete(0, 1);
+                }
                 try {
-                    listOfPropertys.add(Properties.valueOf(property).toString());
+                    listOfPropertys.add(Properties.valueOf(property.toString()).toString());
                 } catch (IllegalArgumentException | NullPointerException exception) {
-                    bs.set(i - 2);
+                    bitSet.set(i - 2);
+                }
+                if ((negativeProperty) && (bitSet.isEmpty())) {
+                    listOfPropertys.set(i - 2, "-" + listOfPropertys.get(i - 2));
+                    negativeProperty = false;
                 }
             }
         }
-        //
         StringBuilder sb = new StringBuilder();
         String temp = "";
-        if (!bs.isEmpty()) {
+        if (!bitSet.isEmpty()) {
             for (int i = 0; i <= nums.length - 3; i++) {
-                if (bs.get(i)) temp = nums[i + 2] + ", ";
+                if (bitSet.get(i)) temp = nums[i + 2] + ", ";
                 sb.append(temp);
             }
             sb.delete(sb.length() - 2, sb.length());
-            if (bs.cardinality() == 1)
+            if (bitSet.cardinality() == 1)
                 System.out.printf("The property [%s] is wrong.\n", sb.toString().toUpperCase(Locale.ROOT));
             else System.out.printf("The properties [%s] are wrong.\n", sb.toString().toUpperCase(Locale.ROOT));
-                System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, " +
-                        "PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING, HAPPY, SAD]");
-                System.out.println();
-                System.out.print("Enter a request: ");
-                bs.clear();
-                return -1;
-       }
+            System.out.println("Available properties: [EVEN, ODD, BUZZ, DUCK, " +
+                    "PALINDROMIC, GAPFUL, SPY, SQUARE, SUNNY, JUMPING, HAPPY, SAD]");
+            System.out.println();
+            System.out.print("Enter a request: ");
+            bitSet.clear();
+            return -1;
+        }
         // Check properties for compatibility. Incompatible pairs Even and Odd, Duck and Spy,
         // Sunny and Square, Happy and Sad
-        for (int i = 0; i < listOfPropertys.size() - 1; i++) {
-            for (int j = 1; j < listOfPropertys.size(); j++) {
-                if (((listOfPropertys.get(i).equals(Properties.EVEN.toString()))
-                        && (listOfPropertys.get(j).equals(Properties.ODD.toString())))
-                        || ((listOfPropertys.get(i).equals(Properties.ODD.toString()))
-                        && (listOfPropertys.get(j).equals(Properties.EVEN.toString())))) {
-                    System.out.println("The request contains mutually exclusive properties: [ODD, EVEN]");
-                    System.out.println("There are no numbers with these properties.");
-                    System.out.println();
-                    System.out.print("Enter a request: ");
-                    listOfPropertys.clear();
-                    return -1;
-                } else if (((listOfPropertys.get(i).equals(Properties.DUCK.toString()))
-                        && (listOfPropertys.get(j).equals(Properties.SPY.toString())))
-                        || ((listOfPropertys.get(i).equals(Properties.SPY.toString()))
-                        && (listOfPropertys.get(j).equals(Properties.DUCK.toString())))) {
-                    System.out.println("The request contains mutually exclusive properties: [DUCK, SPY]");
-                    System.out.println("There are no numbers with these properties.");
-                    System.out.println();
-                    System.out.print("Enter a request: ");
-                    listOfPropertys.clear();
-                    return -1;
-                } else if (((listOfPropertys.get(i).equals(Properties.SUNNY.toString()))
-                        && (listOfPropertys.get(j).equals(Properties.SQUARE.toString())))
-                        || ((listOfPropertys.get(i).equals(Properties.SQUARE.toString()))
-                        && (listOfPropertys.get(j).equals(Properties.SUNNY.toString())))) {
-                    System.out.println("The request contains mutually exclusive properties: [SUNNY, SQUARE]");
-                    System.out.println("There are no numbers with these properties.");
-                    System.out.println();
-                    System.out.print("Enter a request: ");
-                    listOfPropertys.clear();
-                    return -1;
-                }
-                else if (((listOfPropertys.get(i).equals(Properties.HAPPY.toString()))
-                        && (listOfPropertys.get(j).equals(Properties.SAD.toString())))
-                        || ((listOfPropertys.get(i).equals(Properties.SAD.toString()))
-                        && (listOfPropertys.get(j).equals(Properties.HAPPY.toString())))) {
-                    System.out.println("The request contains mutually exclusive properties: [HAPPY, SAD]");
-                    System.out.println("There are no numbers with these properties.");
-                    System.out.println();
-                    System.out.print("Enter a request: ");
-                    listOfPropertys.clear();
-                    return -1;
-                }
-
-            }
+        if (checkPairs(listOfPropertys).length() > 0) {
+            System.out.printf("The request contains mutually exclusive properties: [%s]%n", incorrectPairs);
+            System.out.println("There are no numbers with these properties.");
+            System.out.println();
+            System.out.print("Enter a request: ");
+            listOfPropertys.clear();
+            incorrectPairs = "";
+            return -1;
         }
         return 1;
+    }
 
+    /**
+     * @param list - list of all parameters entered by the user
+     */
+    public static String checkPairs(List<String> list) {
+        //Option 1 5 -spy -spy is not implemented
+        for (int i = 0; i < list.size() - 1; i++) {
+            for (int j = 1; j < list.size(); j++) {
+                if (((list.get(i).startsWith("-") && (list.get(i).substring(1).equals(list.get(j)))))
+                        || ((list.get(j).startsWith("-") && (list.get(j).substring(1).equals(list.get(i)))))) {
+                    incorrectPairs = list.get(i) + ", " + list.get(j);
+                }
+            }
+        }
+        // We check the match of the pairs, but if they were with a minus, then we add it for printing.
+        if ((list.contains("EVEN")) && (list.contains("ODD"))) incorrectPairs = "EVEN, ODD";
+        else if ((list.contains("-EVEN")) && (list.contains("-ODD"))) incorrectPairs = "-EVEN, -ODD";
+        else if ((list.contains("DUCK")) && (list.contains("SPY"))) incorrectPairs = "DUCK, SPY";
+        else if ((list.contains("-DUCK")) && (list.contains("-SPY"))) incorrectPairs = "-DUCK, -SPY";
+        else if ((list.contains("SUNNY")) && (list.contains("SQUARE"))) incorrectPairs = "SUNNY, SQUARE";
+        else if ((list.contains("-SUNNY")) && (list.contains("-SQUARE"))) incorrectPairs = "-SUNNY, -SQUARE";
+        else if ((list.contains("HAPPY")) && (list.contains("SAD"))) incorrectPairs = "HAPPY, SAD";
+        else if ((list.contains("-HAPPY")) && (list.contains("-SAD"))) incorrectPairs = "HAPPY, SAD";
+
+        return incorrectPairs;
     }
 
     /**
@@ -246,51 +244,60 @@ public class Main {
         BitSet bitSet = new BitSet(8);
         List<Long> listNums = new ArrayList<>();
         long checknum = startNum;
+        int flagAddingNumber = 0;
+        boolean skipNumber = false;
+        for (String p : properties) if (!p.startsWith("-")) flagAddingNumber++;
         while (listNums.size() < repeatNum) {
             for (int i = 0; i < properties.size(); i++) {
-                switch (Properties.valueOf(properties.get(i))) {
-                    case BUZZ:
+                switch (properties.get(i)) {
+                    case "BUZZ":
                         if (checkBuzz(checknum)) bitSet.set(i);
                         break;
-                    case DUCK:
+                    case "DUCK":
                         if (checkDuck(checknum)) bitSet.set(i);
                         break;
-                    case PALINDROMIC:
+                    case "PALINDROMIC":
                         if (checkPalindrome(checknum)) bitSet.set(i);
                         break;
-                    case GAPFUL:
+                    case "GAPFUL":
                         if (checkGapful(checknum)) bitSet.set(i);
                         break;
-                    case SPY:
+                    case "SPY":
                         if (checkSpy(checknum)) bitSet.set(i);
                         break;
-                    case EVEN:
+                    case "EVEN":
                         if (checkEven(checknum)) bitSet.set(i);
                         break;
-                    case ODD:
+                    case "ODD":
                         if (checkOdd(checknum)) bitSet.set(i);
                         break;
-                    case SQUARE:
+                    case "SQUARE":
                         if (checkSquare(checknum)) bitSet.set(i);
                         break;
-                    case SUNNY:
+                    case "SUNNY":
                         if (checkSunny(checknum)) bitSet.set(i);
                         break;
-                    case JUMPING:
+                    case "JUMPING":
                         if (checkJumping(checknum)) bitSet.set(i);
                         break;
-                    case HAPPY:
+                    case "HAPPY":
                         if (checkHappy(checknum)) bitSet.set(i);
                         break;
-                    case SAD:
-                        if (checkSad(checknum)) bitSet.set(i);
-                        break;
+                    case "SAD":
+                        if (checkSad(checknum)) {
+                            bitSet.set(i);
+                            break;
+                        }
                     default:
-                        System.out.println("I can't process this property");
+                        if (properties.get(i).startsWith("-")) {
+                            skipNumber = checkNegativeProperties(checknum, properties.get(i));
+                        }
+
                 }
             }
-            if (bitSet.cardinality() == properties.size()) listNums.add(checknum);
+            if ((bitSet.cardinality() == flagAddingNumber) && !skipNumber) listNums.add(checknum);
             bitSet.clear();
+            skipNumber = false;
             checknum += 1;
         }
         for (Long num : listNums) {
@@ -309,8 +316,59 @@ public class Main {
                     + (checkSad(num) ? ", sad" : ""));
         }
         listOfPropertys.clear();
+        listNums.clear();
         System.out.println();
         System.out.print("Enter a request: ");
+    }
+
+    /**
+     * Check whether the number has a negative property
+     *
+     * @param num      numver
+     * @param property the property of a number, must begin with a minus
+     * @return true if the number has a negative property
+     */
+    public static boolean checkNegativeProperties(long num, String property) {
+        String test = property.substring(1);
+        switch (test) {
+            case "BUZZ":
+                if (checkBuzz(num)) return true;
+                break;
+            case "DUCK":
+                if (checkDuck(num)) return true;
+                break;
+            case "PALINDROMIC":
+                if (checkPalindrome(num)) return true;
+                break;
+            case "GAPFUL":
+                if (checkGapful(num)) return true;
+                break;
+            case "SPY":
+                if (checkSpy(num)) return true;
+                break;
+            case "EVEN":
+                if (checkEven(num)) return true;
+                break;
+            case "ODD":
+                if (checkOdd(num)) return true;
+                break;
+            case "SQUARE":
+                if (checkSquare(num)) return true;
+                break;
+            case "SUNNY":
+                if (checkSunny(num)) return true;
+                break;
+            case "JUMPING":
+                if (checkJumping(num)) return true;
+                break;
+            case "HAPPY":
+                if (checkHappy(num)) return true;
+                break;
+            case "SAD":
+                if (checkSad(num)) return true;
+                break;
+        }
+        return false;
     }
 
     /**
@@ -434,6 +492,7 @@ public class Main {
         }
         return (count == array.length - 1);
     }
+
     /**
      * In number theory, a happy number is a number that reaches
      * 1 after a sequence during which the number is replaced
@@ -451,7 +510,7 @@ public class Main {
                 num /= 10;
             }
             long sumSquares = 0;
-            for (long l: array) {
+            for (long l : array) {
                 sumSquares += Math.pow(l, 2);
             }
             if (sumSquares == 1) return true;
@@ -459,8 +518,9 @@ public class Main {
             else num = sumSquares;
         }
     }
+
     public static boolean checkSad(long num) {
         return !checkHappy(num);
-   }
+    }
 }
 
